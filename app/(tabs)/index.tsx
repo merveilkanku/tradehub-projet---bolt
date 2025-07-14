@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { TrendingUp, Globe, Users, Bell, Search, Heart } from 'lucide-react-native';
+import { Link, router } from 'expo-router';
 
 import { useAuth } from '../../contexts/AuthContext';
 import { COLORS, FONTS, SIZES } from '../../constants/theme';
@@ -219,7 +220,10 @@ export default function HomeScreen() {
           </View>
 
           {/* Search Bar */}
-          <TouchableOpacity style={styles.searchBar}>
+          <TouchableOpacity
+            style={styles.searchBar}
+            onPress={() => router.push('/search')} // Exemple de route pour la recherche
+          >
             <LinearGradient
               colors={[COLORS.dark.card, COLORS.dark.surface]}
               style={styles.searchGradient}
@@ -243,9 +247,11 @@ export default function HomeScreen() {
               <Text style={styles.heroSubtitle}>
                 La marketplace qui connecte l'Afrique francophone
               </Text>
-              <TouchableOpacity style={styles.heroButton}>
-                <Text style={styles.heroButtonText}>Explorer maintenant</Text>
-              </TouchableOpacity>
+              <Link href="/(tabs)/products" asChild>
+                <TouchableOpacity style={styles.heroButton}>
+                  <Text style={styles.heroButtonText}>Explorer maintenant</Text>
+                </TouchableOpacity>
+              </Link>
             </View>
             <View style={styles.heroImage}>
               <Text style={styles.heroIcon}>🏪</Text>
@@ -273,9 +279,11 @@ export default function HomeScreen() {
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>Catégories populaires</Text>
-            <TouchableOpacity>
-              <Text style={styles.sectionLink}>Voir tout</Text>
-            </TouchableOpacity>
+            <Link href="/categories" asChild> {/* Supposons une page /categories */}
+              <TouchableOpacity>
+                <Text style={styles.sectionLink}>Voir tout</Text>
+              </TouchableOpacity>
+            </Link>
           </View>
           <View style={styles.categoriesGrid}>
             {categories.map((category, index) => (
@@ -284,10 +292,14 @@ export default function HomeScreen() {
                   colors={[COLORS.dark.card, COLORS.dark.surface]}
                   style={styles.categoryGradient}
                 >
-                  <View style={[styles.categoryIcon, { backgroundColor: category.color + '20' }]}>
-                    <Text style={styles.categoryEmoji}>{category.icon}</Text>
-                  </View>
-                  <Text style={styles.categoryName}>{category.name}</Text>
+                  <Link href={`/products?category=${category.name}`} asChild> {/* Navigation vers produits filtrés */}
+                    <View style={{alignItems: 'center'}}>
+                      <View style={[styles.categoryIcon, { backgroundColor: category.color + '20' }]}>
+                        <Text style={styles.categoryEmoji}>{category.icon}</Text>
+                      </View>
+                      <Text style={styles.categoryName}>{category.name}</Text>
+                    </View>
+                  </Link>
                 </LinearGradient>
               </TouchableOpacity>
             ))}
@@ -298,9 +310,11 @@ export default function HomeScreen() {
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>Produits en vedette</Text>
-            <TouchableOpacity>
-              <Text style={styles.sectionLink}>Voir tout</Text>
-            </TouchableOpacity>
+            <Link href="/(tabs)/products" asChild>
+              <TouchableOpacity>
+                <Text style={styles.sectionLink}>Voir tout</Text>
+              </TouchableOpacity>
+            </Link>
           </View>
           
           {loading ? (
@@ -309,32 +323,34 @@ export default function HomeScreen() {
             </View>
           ) : featuredProducts.length > 0 ? (
             <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.productsScroll}>
-              {featuredProducts.map((product) => (
-                <TouchableOpacity key={product.id} style={styles.productCard}>
-                  <LinearGradient
-                    colors={[COLORS.dark.card, COLORS.dark.surface]}
-                    style={styles.productGradient}
-                  >
-                    <Image
-                      source={{ uri: product.images[0] || 'https://images.pexels.com/photos/230544/pexels-photo-230544.jpeg?auto=compress&cs=tinysrgb&w=400' }}
-                      style={styles.productImage}
-                    />
-                    <View style={styles.productInfo}>
-                      <Text style={styles.productTitle} numberOfLines={2}>
-                        {product.title}
-                      </Text>
-                      <Text style={styles.productLocation}>
-                        {product.city}, {product.country}
-                      </Text>
-                      <Text style={styles.productPrice}>
-                        ${product.price} {product.currency}
-                      </Text>
-                    </View>
-                    <TouchableOpacity style={styles.favoriteButton}>
-                      <Heart size={16} color={COLORS.neon.pink} />
-                    </TouchableOpacity>
-                  </LinearGradient>
-                </TouchableOpacity>
+              {featuredProducts.map((product) => ( // Envelopper la carte produit avec Link
+                <Link href={`/product/${product.id}`} key={product.id} asChild>
+                  <TouchableOpacity style={styles.productCard}>
+                    <LinearGradient
+                      colors={[COLORS.dark.card, COLORS.dark.surface]}
+                      style={styles.productGradient}
+                    >
+                      <Image
+                        source={{ uri: product.images[0] || 'https://images.pexels.com/photos/230544/pexels-photo-230544.jpeg?auto=compress&cs=tinysrgb&w=400' }}
+                        style={styles.productImage}
+                      />
+                      <View style={styles.productInfo}>
+                        <Text style={styles.productTitle} numberOfLines={2}>
+                          {product.title}
+                        </Text>
+                        <Text style={styles.productLocation}>
+                          {product.city}, {product.country}
+                        </Text>
+                        <Text style={styles.productPrice}>
+                          ${product.price} {product.currency}
+                        </Text>
+                      </View>
+                      <TouchableOpacity style={styles.favoriteButton} onPress={() => console.log('Favori cliqué pour:', product.id)}>
+                        <Heart size={16} color={COLORS.neon.pink} />
+                      </TouchableOpacity>
+                    </LinearGradient>
+                  </TouchableOpacity>
+                </Link>
               ))}
             </ScrollView>
           ) : (
