@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Search, Filter, Heart, MessageCircle, MapPin } from 'lucide-react-native';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 
 import { useAuth } from '../../contexts/AuthContext';
 import { COLORS, FONTS, SIZES } from '../../constants/theme';
@@ -27,10 +28,42 @@ export default function ProductsScreen() {
   const [refreshing, setRefreshing] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
+  const params = useLocalSearchParams<{ category?: string }>();
+  const router = useRouter();
 
   useEffect(() => {
+    // Si une catégorie est passée en paramètre d'URL, l'utiliser
+    if (params.category && params.category !== selectedCategory) {
+      setSelectedCategory(params.category);
+    } else {
+      // Sinon, lancer fetchProducts avec la catégorie sélectionnée actuelle (ou aucune)
+      fetchProducts();
+    }
+  }, [params.category, profile]);
+
+  // Ce useEffect réagit aux changements de selectedCategory (y compris ceux initiés par l'URL)
+  // et lance la récupération des produits.
+  useEffect(() => {
     fetchProducts();
-  }, [selectedCategory, profile]);
+  }, [selectedCategory]);
+
+  const handleSetCategory = (category: string) => {
+    setSelectedCategory(category);
+    // Mettre à jour l'URL pour refléter la catégorie sélectionnée
+    // Cela permet de garder l'URL synchronisée avec l'état de l'interface utilisateur
+    if (category) {
+      router.setParams({ category: category });
+    } else {
+      // Si "Toutes" est sélectionné, on pourrait vouloir retirer le paramètre
+      // Cependant, Expo Router ne semble pas avoir de méthode simple pour supprimer un param.
+      // On peut le laisser ou naviguer vers la route sans params.
+      // Pour l'instant, laissons-le ou mettons une valeur vide si nécessaire.
+      // Alternativement, on pourrait ne pas appeler setParams ici si on veut que l'URL ne change
+      // que lorsqu'on arrive via un lien direct avec param.
+      // Pour une meilleure expérience utilisateur et des URL partageables, mettons à jour.
+      router.setParams({ category: category }); // ou router.setParams({ category: undefined }) si supporté
+    }
+  };
 
   const fetchProducts = async () => {
     try {
@@ -134,8 +167,10 @@ export default function ProductsScreen() {
       <View style={styles.header}>
         <Text style={styles.title}>
           Produits
-          {profile?.city && (
-            <Text style={styles.locationSuffix}> à {profile.city}</Text>
+          {selectedCategory ? (
+            <Text style={styles.categorySuffix}> ({selectedCategory})</Text>
+          ) : (
+            profile?.city && <Text style={styles.locationSuffix}> à {profile.city}</Text>
           )}
         </Text>
         <View style={styles.headerInfo}>
@@ -180,7 +215,7 @@ export default function ProductsScreen() {
             styles.categoryButton,
             selectedCategory === '' && styles.categoryButtonActive
           ]}
-          onPress={() => setSelectedCategory('')}
+          onPress={() => handleSetCategory('')}
         >
           <LinearGradient
             colors={selectedCategory === '' ? COLORS.gradients.primary : ['transparent', 'transparent']}
@@ -202,7 +237,7 @@ export default function ProductsScreen() {
               styles.categoryButton,
               selectedCategory === category && styles.categoryButtonActive
             ]}
-            onPress={() => setSelectedCategory(category)}
+            onPress={() => handleSetCategory(category)}
           >
             <LinearGradient
               colors={selectedCategory === category ? COLORS.gradients.secondary : ['transparent', 'transparent']}
@@ -270,6 +305,10 @@ const styles = StyleSheet.create({
   },
   locationSuffix: {
     color: COLORS.neon.blue,
+    fontSize: SIZES.h4,
+  },
+  categorySuffix: {
+    color: COLORS.neon.purple,
     fontSize: SIZES.h4,
   },
   headerInfo: {
