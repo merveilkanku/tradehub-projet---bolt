@@ -12,12 +12,14 @@ export default function RootLayout() {
   return (
     <GestureHandlerRootView style={styles.container}>
       <AuthProvider>
-        <Stack screenOptions={{ headerShown: false }}>
-          <Stack.Screen name="(auth)" />
-          <Stack.Screen name="(tabs)" />
-          <Stack.Screen name="+not-found" />
-        </Stack>
-        <StatusBar style="light" backgroundColor="#0a0a0f" />
+        <>
+          <Stack screenOptions={{ headerShown: false }}>
+            <Stack.Screen name="(auth)" />
+            <Stack.Screen name="(tabs)" />
+            <Stack.Screen name="+not-found" />
+          </Stack>
+          <StatusBar style="light" backgroundColor="#0a0a0f" />
+        </>
       </AuthProvider>
     </GestureHandlerRootView>
   );

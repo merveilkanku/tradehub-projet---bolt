@@ -25,20 +25,39 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      if (session?.user) {
-        fetchProfile(session.user.id);
-      } else {
+    setLoading(true);
+
+    const fetchSessionAndProfile = async () => {
+      try {
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+
+        if (sessionError) throw sessionError;
+
+        if (session) {
+          setSession(session);
+          setUser(session.user);
+          await fetchProfile(session.user.id);
+        } else {
+          setSession(null);
+          setUser(null);
+          setProfile(null);
+          setLoading(false);
+        }
+      } catch (e) {
+        console.error("Erreur au chargement de la session", e);
+        setSession(null);
+        setUser(null);
+        setProfile(null);
         setLoading(false);
       }
-    });
+    };
 
-    // Listen for auth changes
+    fetchSessionAndProfile();
+
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
+        // Sur un changement, on considère qu'on charge les nouvelles infos
+        setLoading(true);
         setSession(session);
         setUser(session?.user ?? null);
         
@@ -51,7 +70,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
     );
 
-    return () => subscription.unsubscribe();
+    return () => {
+      subscription.unsubscribe();
+    };
   }, []);
 
   const fetchProfile = async (userId: string) => {
