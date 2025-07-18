@@ -10,7 +10,7 @@ import {
   RefreshControl,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { TrendingUp, Globe, Users, Bell, Search, Heart } from 'lucide-react-native';
+import { TrendingUp, Globe, Users, Bell, Search, Heart, User } from 'lucide-react-native';
 import { Link, router } from 'expo-router';
 
 import { useAuth } from '../../contexts/AuthContext';
@@ -184,14 +184,16 @@ export default function HomeScreen() {
             <View style={styles.userInfo}>
               {user && profile ? (
                 <View style={styles.userProfile}>
-                  <Image
-                    source={
-                      profile.avatar_url
-                        ? { uri: profile.avatar_url }
-                        : require('../../assets/images/default_avatar.jpg')
-                    }
-                    style={styles.userAvatar}
-                  />
+                  {profile.avatar_url ? (
+                    <Image
+                      source={{ uri: profile.avatar_url }}
+                      style={styles.userAvatar}
+                    />
+                  ) : (
+                    <View style={[styles.userAvatar, styles.defaultAvatar]}>
+                      <User size={28} color={COLORS.neon.blue} />
+                    </View>
+                  )}
                   <View>
                     <Text style={styles.greeting}>
                       Bonjour, {profile.full_name?.split(' ')[0] || 'Utilisateur'}
@@ -395,6 +397,11 @@ const styles = StyleSheet.create({
     marginRight: SIZES.md,
     borderWidth: 2,
     borderColor: COLORS.neon.blue + '50',
+  },
+  defaultAvatar: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: COLORS.dark.card,
   },
   greeting: {
     fontSize: SIZES.h3,
