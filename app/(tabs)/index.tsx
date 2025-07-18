@@ -289,15 +289,17 @@ export default function HomeScreen() {
             {categories.map((category, index) => (
               <Link key={index} href={`/(tabs)/products?category=${category.name}`} asChild>
                 <TouchableOpacity style={styles.categoryCard}>
-                  {/* Remplacé LinearGradient par une View pour le débogage de l'erreur React.Children.only */}
-                  <View style={[styles.categoryGradient, {backgroundColor: COLORS.dark.card}]}>
+                  <LinearGradient
+                    colors={[COLORS.dark.card, COLORS.dark.surface]}
+                    style={styles.categoryGradient}
+                  >
                     <View style={{alignItems: 'center'}}>
                       <View style={[styles.categoryIcon, { backgroundColor: category.color + '20' }]}>
                         <Text style={styles.categoryEmoji}>{category.icon}</Text>
                       </View>
                       <Text style={styles.categoryName}>{category.name}</Text>
                     </View>
-                  </View>
+                  </LinearGradient>
                 </TouchableOpacity>
               </Link>
             ))}
