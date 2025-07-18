@@ -185,9 +185,11 @@ export default function HomeScreen() {
               {user && profile ? (
                 <View style={styles.userProfile}>
                   <Image
-                    source={{ 
-                      uri: profile.avatar_url || 'https://images.pexels.com/photos/3532544/pexels-photo-3532544.jpeg?auto=compress&cs=tinysrgb&w=400' 
-                    }}
+                    source={
+                      profile.avatar_url
+                        ? { uri: profile.avatar_url }
+                        : require('../../assets/images/default_avatar.jpg')
+                    }
                     style={styles.userAvatar}
                   />
                   <View>
