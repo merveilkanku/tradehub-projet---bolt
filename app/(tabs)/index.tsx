@@ -287,21 +287,21 @@ export default function HomeScreen() {
           </View>
           <View style={styles.categoriesGrid}>
             {categories.map((category, index) => (
-              <TouchableOpacity key={index} style={styles.categoryCard}>
-                <LinearGradient
-                  colors={[COLORS.dark.card, COLORS.dark.surface]}
-                  style={styles.categoryGradient}
-                >
-                  <Link href={`/products?category=${category.name}`} asChild> {/* Navigation vers produits filtrés */}
+              <Link key={index} href={`/(tabs)/products?category=${category.name}`} asChild>
+                <TouchableOpacity style={styles.categoryCard}>
+                  <LinearGradient
+                    colors={[COLORS.dark.card, COLORS.dark.surface]}
+                    style={styles.categoryGradient}
+                  >
                     <View style={{alignItems: 'center'}}>
                       <View style={[styles.categoryIcon, { backgroundColor: category.color + '20' }]}>
                         <Text style={styles.categoryEmoji}>{category.icon}</Text>
                       </View>
                       <Text style={styles.categoryName}>{category.name}</Text>
                     </View>
-                  </Link>
-                </LinearGradient>
-              </TouchableOpacity>
+                  </LinearGradient>
+                </TouchableOpacity>
+              </Link>
             ))}
           </View>
         </View>
@@ -345,9 +345,9 @@ export default function HomeScreen() {
                           ${product.price} {product.currency}
                         </Text>
                       </View>
-                      <TouchableOpacity style={styles.favoriteButton} onPress={() => console.log('Favori cliqué pour:', product.id)}>
+                      <View style={styles.favoriteButton}>
                         <Heart size={16} color={COLORS.neon.pink} />
-                      </TouchableOpacity>
+                      </View>
                     </LinearGradient>
                   </TouchableOpacity>
                 </Link>
