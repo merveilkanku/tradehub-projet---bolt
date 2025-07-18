@@ -130,7 +130,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           country: userData.country,
           city: userData.city,
           address: userData.address,
-          avatar_url: 'https://images.pexels.com/photos/3532544/pexels-photo-3532544.jpeg?auto=compress&cs=tinysrgb&w=400',
+          // avatar_url est maintenant null par défaut à l'inscription
         });
 
       if (profileError) {
